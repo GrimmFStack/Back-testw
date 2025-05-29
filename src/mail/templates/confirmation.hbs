@@ -1,17 +1,10 @@
-<!-- Mantén tu diseño actual, pero añade lógica condicional -->
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-  <h1 style="color: #4CAF50;">{{title}}</h1>
-  <p>{{message}}</p>
-  
+<div style="font-family: Arial; max-width: 600px; margin: 0 auto;">
+  <h1 style="color: #4CAF50;">¡Gracias por registrarte!</h1>
+  <p>Hola {{email}},</p>
   {{#if showButton}}
     <a href="{{confirmUrl}}" style="background: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;">
       Confirmar mi cuenta
     </a>
   {{/if}}
-
-  <p>Ahora puedes <a href="/login">iniciar sesión</a>.</p>
-  <hr />
-  <footer style="color: #666;">
-    <small>© {{currentYear}} {{appName}}. Todos los derechos reservados.</small>
-  </footer>
+  <p>Si no solicitaste este registro, ignora este mensaje.</p>
 </div>

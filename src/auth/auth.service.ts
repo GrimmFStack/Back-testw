@@ -75,8 +75,7 @@ export class AuthService {
 
   try {
     const hashedPassword = await this.hashPassword(password);
-
-    const activationToken = crypto.randomUUID(); // o usa un generador seguro
+    const activationToken = crypto.randomUUID();
 
     await this.usersService.create({
       email: normalizedEmail,
@@ -85,6 +84,7 @@ export class AuthService {
       activation_token: activationToken,
     });
 
+    // Envío de correo (adaptado a tu estructura)
     await this.mailService.sendConfirmationEmail(normalizedEmail, activationToken);
 
     return {
