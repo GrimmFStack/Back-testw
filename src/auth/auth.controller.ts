@@ -87,7 +87,7 @@ export class AuthController {
   return this.authService.register(registerDto); 
 }
 
-// src/auth/auth.controller.ts
+
 @Get('confirm/:activationToken')
 async confirmAccount(
   @Param('activationToken') token: string,
@@ -97,7 +97,9 @@ async confirmAccount(
     const message = await this.authService.confirmAccount(token);
     return res.render('confirmation-success', { message });
   } catch (error) {
-    return res.render('confirmation-error', { error: error.message });
+    return res.render('confirmation-error', { 
+      error: error.message || 'Error al confirmar la cuenta'
+    });
   }
 }
 
