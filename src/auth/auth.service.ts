@@ -5,7 +5,9 @@ import {
   InternalServerErrorException,
   Inject,
   forwardRef,
-  ForbiddenException
+  ForbiddenException,
+  BadRequestException,
+  NotFoundException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -54,10 +56,8 @@ export class AuthService {
   return !!entry;
 }
 
-
   async register(registerDto: RegisterDto): Promise<any> {
   const { email, password } = registerDto;
-
   if (!email || !password) {
     throw new UnauthorizedException('Se requieren email y contraseña');
   }
@@ -158,11 +158,20 @@ async logout(token: string): Promise<any> {
 }
 
 async confirmAccount(activationToken: string): Promise<string> {
-  await this.usersService.confirmUser(activationToken);
-  return `${process.env.FRONTEND_URL}/confirmacion-exitosa`; 
+  try {
+    // Usa el nuevo método específico para activación
+    await this.usersService.activateUserByToken(activationToken);
+    return 'Cuenta activada exitosamente';
+  } catch (error) {
+    // Manejo específico para token inválido
+    if (error instanceof NotFoundException) {
+      throw new BadRequestException('Token inválido o usuario no encontrado');
+    }
+    throw error; // Re-lanza otros errores
+  }
 }
 
-  private async validateUser(email: string, password: string): Promise<User> {
+private async validateUser(email: string, password: string): Promise<User> {
   if (!email || !password) {
     throw new UnauthorizedException('Se requieren email y contraseña');
   }
@@ -185,6 +194,8 @@ async confirmAccount(activationToken: string): Promise<string> {
 }
 
 
+
+
   private async hashPassword(password: string): Promise<string> {
     const salt = await bcrypt.genSalt(this.SALT_ROUNDS);
     return await bcrypt.hash(password, salt);
@@ -205,6 +216,7 @@ async confirmAccount(activationToken: string): Promise<string> {
   }
 }
 
+
 function formatResponse(records: any[]): any {
   return {
     success: true,
@@ -213,4 +225,5 @@ function formatResponse(records: any[]): any {
       total_count: records.length,
     },
   };
+  
 }

@@ -91,23 +91,13 @@ export class AuthController {
 @Get('confirm/:activationToken')
 async confirmAccount(
   @Param('activationToken') token: string,
-  @Query('from') from: string,
   @Res() res: Response
 ) {
   try {
-    await this.authService.confirmAccount(token);
-    
-    // Si viene del correo, renderiza HTML (no JSON)
-    if (from === 'email') {
-      return res.render('confirmation-success'); // Crea esta plantilla
-    }
-
-    return res.json({ success: true });
+    const message = await this.authService.confirmAccount(token);
+    return res.render('confirmation-success', { message });
   } catch (error) {
-    if (from === 'email') {
-      return res.render('confirmation-error', { error });
-    }
-    throw new BadRequestException(error.message);
+    return res.render('confirmation-error', { error: error.message });
   }
 }
 

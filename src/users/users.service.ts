@@ -15,7 +15,7 @@ import { ReplaceUserDto } from './dto/replace-user.dto';
 import { User } from './entities/user.entity';
 import { UsersView } from './entities/users-view.entity';
 import { ActionLogsService } from '../action-logs/action-logs.service';
-import { AuthService } from '../auth/auth.service'; // 👈 importa el AuthService
+import { AuthService } from '../auth/auth.service'; 
 
 @Injectable()
 export class UserService {
@@ -82,6 +82,30 @@ export class UserService {
   };
 }
 
+async activateUser(token: string): Promise<User> {
+  const user = await this.findByActivationToken(token);
+  if (!user) {
+    throw new NotFoundException('Token inválido');
+  }
+
+  user.is_active = true;
+  user.activation_token = null;
+  return this.userRepository.save(user); 
+}
+
+async activateUserByToken(activationToken: string): Promise<User> {
+  const user = await this.findByActivationToken(activationToken);
+  if (!user) {
+    throw new NotFoundException('Token inválido');
+  }
+
+  // Actualización directa sin logs de acción
+  user.is_active = true;
+  user.activation_token = null;
+  user.activated_at = new Date();
+  
+  return this.userRepository.save(user); // Evita el método update con auditoría
+}
 async findByActivationToken(token: string): Promise<User | null> {
     return this.userRepository.findOne({ where: { activation_token: token } });
   }
