@@ -8,7 +8,8 @@ import {
   Req,
   UseGuards,
   UnauthorizedException,
-  Param, BadRequestException
+  Param, BadRequestException,
+  Query
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from '../users/users.service';
@@ -87,48 +88,34 @@ export class AuthController {
 }
 
 @Get('confirm/:activationToken')
-@HttpCode(HttpStatus.OK)
-@ApiOperation({ summary: 'Confirmar cuenta con token de activación' })
-@ApiParam({ 
-  name: 'activationToken', 
-  description: 'Token de activación enviado por email',
-  example: 'a1b2c3d4-e5f6-7890-g1h2-i3j4k5l6m7n8'
-})
-@ApiResponse({
-  status: HttpStatus.OK,
-  description: 'Cuenta activada correctamente',
-  type: ConfirmationResponseDto 
-})
-@ApiResponse({
-  status: HttpStatus.BAD_REQUEST,
-  description: 'Token inválido o expirado',
-  schema: {
-    example: {
-      statusCode: 400,
-      message: 'Token inválido o expirado',
-      error: 'Bad Request'
-    }
-  }
-})
 async confirmAccount(
   @Param('activationToken') activationToken: string,
-  @Res({ passthrough: true }) res: Response,
-  @Req() req: Request
-): Promise<ConfirmationResponseDto | void> { 
+  @Res() res: Response,
+  @Req() req: Request,
+) {
   try {
     const message = await this.authService.confirmAccount(activationToken);
 
+    // Si es un navegador (Accept: text/html)
     if (req.headers.accept?.includes('text/html')) {
-      return res.redirect(`${process.env.FRONTEND_URL}/confirmacion-exitosa?message=${encodeURIComponent(message)}`);
+      return res.render('confirmation', {  // Usa tu plantilla confirmation.hbs
+        title: '¡Cuenta Confirmada!',
+        message,
+        appName: 'Tu App',
+        showButton: false, // Opcional: ocultar el botón en esta vista
+      });
     }
 
-    return {
-      success: true,
-      message,
-      redirectUrl: `${process.env.FRONTEND_URL}/confirmacion-exitosa`
-    };
+    // Si es una API (Accept: application/json)
+    return res.json({ success: true, message });
   } catch (error) {
-    throw new BadRequestException(error.message || 'Token inválido o expirado');
+    if (req.headers.accept?.includes('text/html')) {
+      return res.render('verification', {  // Usa verification.hbs para errores
+        title: 'Error de Confirmación',
+        error: error.message || 'Token inválido',
+      });
+    }
+    throw new BadRequestException(error.message || 'Token inválido');
   }
 }
 
