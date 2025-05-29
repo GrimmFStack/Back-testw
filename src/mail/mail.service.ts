@@ -5,26 +5,20 @@ import { MailerService } from '@nestjs-modules/mailer';
 export class MailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendConfirmationEmail(email: string, token: string) {
-    const activationUrl = `${process.env.BACKEND_URL}/auth/confirm/${token}`;
+  // src/mail/mail.service.ts
+async sendConfirmationEmail(email: string, token: string) {
+  // Usa HTTPS aunque estés en desarrollo (Mailtrap lo requiere)
+  const confirmUrl = `https://${process.env.BACKEND_URL}/auth/confirm/${token}`.replace('http://', '');
 
-    try {
-      await this.mailerService.sendMail({
-        to: email,
-        subject: `Confirma tu registro en ${process.env.APP_NAME}`,
-        template: process.env.NODE_ENV === 'production' ? 'verification' : 'confirmation',
-        context: {
-          email, // Usamos directamente el email
-          appName: process.env.APP_NAME,
-          currentYear: new Date().getFullYear(),
-          activationUrl, // Para verification.hbs
-          confirmUrl: activationUrl, // Para confirmation.hbs
-          showButton: true
-        },
-      });
-    } catch (error) {
-      console.error('Error enviando correo:', error);
-      throw new Error('No se pudo enviar el correo de confirmación');
-    }
-  }
+  await this.mailerService.sendMail({
+    to: email,
+    subject: 'Confirma tu registro',
+    template: 'confirmation',
+    context: {
+      email,
+      confirmUrl: confirmUrl + '?from=email', // Añade un parámetro para debug
+      appName: process.env.APP_NAME,
+    },
+  });
 }
+  }

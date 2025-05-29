@@ -87,35 +87,27 @@ export class AuthController {
   return this.authService.register(registerDto); 
 }
 
+// src/auth/auth.controller.ts
 @Get('confirm/:activationToken')
 async confirmAccount(
-  @Param('activationToken') activationToken: string,
-  @Res() res: Response,
-  @Req() req: Request,
+  @Param('activationToken') token: string,
+  @Query('from') from: string,
+  @Res() res: Response
 ) {
   try {
-    const message = await this.authService.confirmAccount(activationToken);
-
-    // Si es un navegador (Accept: text/html)
-    if (req.headers.accept?.includes('text/html')) {
-      return res.render('confirmation', {  // Usa tu plantilla confirmation.hbs
-        title: '¡Cuenta Confirmada!',
-        message,
-        appName: 'Tu App',
-        showButton: false, // Opcional: ocultar el botón en esta vista
-      });
+    await this.authService.confirmAccount(token);
+    
+    // Si viene del correo, renderiza HTML (no JSON)
+    if (from === 'email') {
+      return res.render('confirmation-success'); // Crea esta plantilla
     }
 
-    // Si es una API (Accept: application/json)
-    return res.json({ success: true, message });
+    return res.json({ success: true });
   } catch (error) {
-    if (req.headers.accept?.includes('text/html')) {
-      return res.render('verification', {  // Usa verification.hbs para errores
-        title: 'Error de Confirmación',
-        error: error.message || 'Token inválido',
-      });
+    if (from === 'email') {
+      return res.render('confirmation-error', { error });
     }
-    throw new BadRequestException(error.message || 'Token inválido');
+    throw new BadRequestException(error.message);
   }
 }
 
