@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Error de confirmación</title>
+    <title>Error de Confirmación - {{appName}}</title>
     <style>
-        body { font-family: Arial; text-align: center; padding: 50px; }
-        .error { color: #f44336; font-size: 24px; }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+        .error { color: #f44336; font-size: 24px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <div class="error">❌ {{error}}</div>
-    <p>Por favor, solicita un nuevo enlace de confirmación.</p>
+    <div class="error">❌ Error al confirmar la cuenta</div>
+    <p>{{error}}</p>
+    <p>Por favor solicita un nuevo enlace de confirmación.</p>
 </body>
 </html>

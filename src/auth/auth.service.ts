@@ -146,24 +146,28 @@ export class AuthService {
     return formatResponse([{ message: 'Sesión cerrada correctamente' }]);
   }
 
-  async confirmAccount(activationToken: string): Promise<string> {
-    try {
-      const { email } = this.jwtService.verify(activationToken, {
-        secret: this.configService.get('JWT_ACTIVATION_SECRET')
-      });
+  async confirmAccount(activationToken: string): Promise<{ accessToken: string }> {
+  try {
+    // Verificar token
+    const { email } = this.jwtService.verify(activationToken, {
+      secret: this.configService.get('JWT_ACTIVATION_SECRET')
+    });
 
-      const user = await this.usersService.findByEmail(email);
-      if (!user || user.activation_token !== activationToken) {
-        throw new NotFoundException('Token inválido');
-      }
+    // Activar usuario
+    const user = await this.usersService.activateUserByToken(activationToken);
+    
+    // Generar token de acceso
+    const accessToken = this.jwtService.sign({
+      sub: user.user_id,
+      email: user.email
+    });
 
-      await this.usersService.activateUserByToken(activationToken);  // Usando el método correcto
-      return 'Cuenta activada exitosamente';
-    } catch (error) {
-      console.error('Error en confirmación:', error);
-      throw new BadRequestException('Token de activación inválido o expirado');
-    }
+    return { accessToken };
+    
+  } catch (error) {
+    throw new BadRequestException('Token de activación inválido o expirado');
   }
+}
 
   private async validateUser(email: string, password: string): Promise<User> {
     const user = await this.usersService.findByEmailWithPassword(email);
