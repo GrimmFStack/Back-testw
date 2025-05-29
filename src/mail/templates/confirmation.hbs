@@ -1,0 +1,24 @@
+<!-- src/mail/templates/confirmation.hbs -->
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <h1 style="color: #4CAF50;">¡Gracias por registrarte!</h1>
+  <p>Para completar tu registro, haz clic en el botón de confirmación:</p>
+  <a 
+    href="{{confirmUrl}}" 
+    style="
+      background: #4CAF50;
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 5px;
+      display: inline-block;
+      margin: 20px 0;
+    "
+  >
+    Confirmar mi cuenta
+  </a>
+  <p>Si no solicitaste este registro, ignora este mensaje.</p>
+  <hr />
+  <p style="color: #666;">
+    <small>Este enlace expirará en 24 horas.</small>
+  </p>
+</div>
