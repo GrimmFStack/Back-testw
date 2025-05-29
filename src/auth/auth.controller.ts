@@ -13,8 +13,12 @@ import {
 import { AuthService } from './auth.service';
 import { UserService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
+import { Response, Request } from 'express'; 
+import { ConfirmationResponseDto } from './dto/confirmation-response.dto';
+import { Res} from '@nestjs/common'; 
 import { LoginDto } from './dto/login.dto';
-import { Request } from 'express';
+
+
 import {
   ApiTags,
   ApiOperation,
@@ -83,25 +87,50 @@ export class AuthController {
 }
 
 @Get('confirm/:activationToken')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Confirmar cuenta con token de activación' })
-  @ApiParam({ name: 'activationToken', description: 'Token de activación enviado por email' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Cuenta activada correctamente',
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Token inválido o expirado',
-  })
-  async confirmAccount(@Param('activationToken') activationToken: string) {
-    try {
-      const message = await this.authService.confirmAccount(activationToken);
-      return formatResponse([{ message }]);
-    } catch (error) {
-      throw new BadRequestException(error.message || 'Token inválido o expirado');
+@HttpCode(HttpStatus.OK)
+@ApiOperation({ summary: 'Confirmar cuenta con token de activación' })
+@ApiParam({ 
+  name: 'activationToken', 
+  description: 'Token de activación enviado por email',
+  example: 'a1b2c3d4-e5f6-7890-g1h2-i3j4k5l6m7n8'
+})
+@ApiResponse({
+  status: HttpStatus.OK,
+  description: 'Cuenta activada correctamente',
+  type: ConfirmationResponseDto 
+})
+@ApiResponse({
+  status: HttpStatus.BAD_REQUEST,
+  description: 'Token inválido o expirado',
+  schema: {
+    example: {
+      statusCode: 400,
+      message: 'Token inválido o expirado',
+      error: 'Bad Request'
     }
   }
+})
+async confirmAccount(
+  @Param('activationToken') activationToken: string,
+  @Res({ passthrough: true }) res: Response,
+  @Req() req: Request
+): Promise<ConfirmationResponseDto | void> { 
+  try {
+    const message = await this.authService.confirmAccount(activationToken);
+
+    if (req.headers.accept?.includes('text/html')) {
+      return res.redirect(`${process.env.FRONTEND_URL}/confirmacion-exitosa?message=${encodeURIComponent(message)}`);
+    }
+
+    return {
+      success: true,
+      message,
+      redirectUrl: `${process.env.FRONTEND_URL}/confirmacion-exitosa`
+    };
+  } catch (error) {
+    throw new BadRequestException(error.message || 'Token inválido o expirado');
+  }
+}
 
 
   @Post('login')

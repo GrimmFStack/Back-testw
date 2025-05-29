@@ -157,10 +157,10 @@ async logout(token: string): Promise<any> {
   return formatResponse([{ message: 'Sesión cerrada correctamente' }]);
 }
 
-async confirmAccount(activationToken: string): Promise<any> {
-  return this.usersService.confirmUser(activationToken);
+async confirmAccount(activationToken: string): Promise<string> {
+  await this.usersService.confirmUser(activationToken);
+  return `${process.env.FRONTEND_URL}/confirmacion-exitosa`; 
 }
-
 
   private async validateUser(email: string, password: string): Promise<User> {
   if (!email || !password) {
