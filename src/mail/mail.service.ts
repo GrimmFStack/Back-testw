@@ -7,17 +7,26 @@
 
     // src/mail/mail.service.ts
   async sendConfirmationEmail(email: string, token: string) {
-    // Usa HTTPS aunque estés en desarrollo (Mailtrap lo requiere)
-    const confirmUrl = `${process.env.BACKEND_URL}/auth/confirm/${token}`;
+  // Define la URL de activación (¡esto es lo que faltaba!)
+  const activationUrl = `${process.env.BACKEND_URL}/auth/confirm/${token}`;
+
+  try {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Confirma tu registro',
       template: 'confirmation',
       context: {
         email,
-        confirmUrl: confirmUrl + '?from=email', // Añade un parámetro para debug
-        appName: process.env.APP_NAME,
-      },
+        confirmUrl: activationUrl,  // Usa la variable definida
+        showButton: true,
+        appName: process.env.APP_NAME || 'Tienda API'
+      }
     });
+  } catch (error) {
+    console.error('Error enviando correo:', error);
+    throw new Error('No se pudo enviar el correo de confirmación');
   }
-    }
+}
+};
+  
+    
