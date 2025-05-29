@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MailService } from './mail.service'; // Asegúrate de tener este archivo
-import { MailController } from './mail.controller'; // Asegúrate de tener este archivo
+import { MailService } from './mail.service';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 
@@ -12,30 +11,34 @@ import { join } from 'path';
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => ({
         transport: {
-          host: config.get('MAILTRAP_HOST'),
-          port: config.get('MAILTRAP_PORT'),
-          secure: false, // True para puerto 465 (Mailtrap usa 2525 sin SSL)
+          host: config.get('MAIL_HOST', 'sandbox.smtp.mailtrap.io'),
+          port: config.get('MAIL_PORT', 2525),
+          secure: config.get('MAIL_SECURE', false),
           auth: {
-            user: config.get('MAILTRAP_USER'),
-            pass: config.get('MAILTRAP_PASSWORD'),
+            user: config.get('MAIL_USER'),
+            pass: config.get('MAIL_PASSWORD'),
           },
+          pool: true,
+          maxConnections: 5,
+          rateLimit: 5
         },
         defaults: {
-          from: `"${config.get('MAIL_FROM_NAME')}" <${config.get('MAIL_FROM_ADDRESS')}>`,
+          from: `"${config.get('MAIL_FROM_NAME', 'No Reply')}" <${config.get('MAIL_FROM_ADDRESS', 'no-reply@example.com')}>`,
         },
         template: {
-          dir: join(__dirname, 'templates'), // Ruta a tus plantillas .hbs
+          dir: join(__dirname, 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
           },
         },
+        logger: config.get('NODE_ENV') === 'development',
+        debug: config.get('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],
     }),
   ],
-  controllers: [MailController], 
-  providers: [MailService], 
-  exports: [MailService], 
+  providers: [MailService],
+  exports: [MailService],
 })
 export class MailModule {}
