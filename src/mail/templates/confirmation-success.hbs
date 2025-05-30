@@ -1,28 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cuenta Confirmada - {{appName}}</title>
+    <title>Cuenta Confirmada</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
-        .success { color: #4CAF50; font-size: 24px; margin-bottom: 20px; }
-        .token-box { 
+        body { font-family: Arial; text-align: center; padding: 40px; }
+        .success { color: #4CAF50; font-size: 24px; }
+        .token { 
             background: #f5f5f5; 
             padding: 15px; 
             margin: 20px auto; 
             max-width: 500px;
             word-break: break-all;
-            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="success">✅ ¡Cuenta confirmada exitosamente!</div>
-    <p>Tu cuenta ha sido activada. Copia este token para iniciar sesión:</p>
-    
-    <div class="token-box">
-        {{token}}
-    </div>
-
-    <p>Pega este token en el campo correspondiente en la aplicación.</p>
+    <div class="success">✅ ¡Cuenta confirmada!</div>
+    <p>Tu token de acceso es:</p>
+    <div class="token">{{token}}</div>
+    <p>
+        <a href="{{frontendUrl}}/login?token={{token}}">
+            Ir al login automáticamente
+        </a>
+    </p>
 </body>
-</html> 
+</html>

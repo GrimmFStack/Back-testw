@@ -89,30 +89,27 @@ export class AuthController {
   }
 
   @Get('confirm/:token')
-  @ApiOperation({ summary: 'Confirmar cuenta con token' })
-  @ApiParam({ name: 'token', type: String })
-  async confirmAccount(
-    @Param('token') token: string,
-    @Res() res: Response
-  ) {
-    try {
-      const result = await this.authService.confirmAccount(token);
-      
-      return res.render('confirmation-success', {
-        token: result.accessToken,
-        appName: this.configService.get('APP_NAME'),
-        supportEmail: this.configService.get('SUPPORT_EMAIL')
-      });
-      
-    } catch (error) {
-      return res.render('confirmation-error', {
-        error: error.message,
-        appName: this.configService.get('APP_NAME'),
-        supportEmail: this.configService.get('SUPPORT_EMAIL'),
-        retryUrl: `${this.configService.get('FRONTEND_URL')}/resend-activation`
-      });
-    }
+async confirmAccount(
+  @Param('token') token: string,
+  @Res() res: Response
+) {
+  try {
+    const result = await this.authService.confirmAccount(token);
+    
+    // Renderiza una página HTML con el token (NO redirección)
+    return res.render('confirmation-success', {
+      token: result.accessToken,
+      appName: this.configService.get('APP_NAME'),
+      frontendUrl: this.configService.get('FRONTEND_URL')
+    });
+    
+  } catch (error) {
+    return res.render('confirmation-error', {
+      error: error.message,
+      appName: this.configService.get('APP_NAME')
+    });
   }
+} 
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
