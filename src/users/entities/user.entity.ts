@@ -32,6 +32,6 @@ export class User {
   @Column({ type: 'varchar',nullable: true })
   activation_token: string | null;
 
-  @Column({ type: 'timestamp', nullable: true })
-  activated_at: Date;
-}
+    @Column({ type: 'timestamp', nullable: true })
+    activated_at: Date;
+  }

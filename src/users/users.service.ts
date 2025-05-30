@@ -199,7 +199,7 @@ async activateUserByToken(token: string): Promise<void> {
     { 
       is_active: true,
       activation_token: null,
-      created_at: new Date() 
+      activated_at: new Date() 
     }
   );
 
