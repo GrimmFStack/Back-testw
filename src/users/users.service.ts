@@ -193,16 +193,23 @@ export class UserService {
     return this.userRepository.save(user); 
   }
 
-  async activateUserByToken(activationToken: string): Promise<User> {
-    const user = await this.findByActivationToken(activationToken);
-    if (!user) {
-      throw new NotFoundException('Token inválido');
-    }
-    user.is_active = true;
-    user.activation_token = null;
-    user.activated_at = new Date();
-    return this.userRepository.save(user);
+  // user.service.ts
+async activateUserByToken(token: string): Promise<User> {
+  const user = await this.userRepository.findOne({ 
+    where: { activation_token: token } 
+  });
+
+  if (!user) {
+    throw new NotFoundException('Token de activación inválido');
   }
+
+  // Actualiza el usuario
+  user.is_active = true;
+  user.activation_token = null; // Elimina el token usado
+  await this.userRepository.save(user);
+
+  return user;
+}
 
   async confirmUser(activationToken: string): Promise<any> {
     const user = await this.findByActivationToken(activationToken);

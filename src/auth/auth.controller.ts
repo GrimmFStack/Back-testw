@@ -88,28 +88,48 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
-  @Get('confirm/:token')
+  // auth.controller.ts
+@Get('confirm/:token')
 async confirmAccount(
   @Param('token') token: string,
   @Res() res: Response
 ) {
   try {
-    const result = await this.authService.confirmAccount(token);
+    const { accessToken } = await this.authService.confirmAccount(token);
     
-    // Renderiza una página HTML con el token (NO redirección)
-    return res.render('confirmation-success', {
-      token: result.accessToken,
-      appName: this.configService.get('APP_NAME'),
-      frontendUrl: this.configService.get('FRONTEND_URL')
-    });
+    // Renderiza página simple con el token
+    return res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Cuenta Activada</title>
+        <style>
+          body { font-family: Arial; text-align: center; padding: 40px; }
+          .token { 
+            background: #f5f5f5; 
+            padding: 15px; 
+            margin: 20px auto;
+            max-width: 500px;
+            word-break: break-all;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>✅ Cuenta activada correctamente</h1>
+        <p>Tu token de acceso es:</p>
+        <div class="token">${accessToken}</div>
+        <p>Copia este token para iniciar sesión en la aplicación</p>
+      </body>
+      </html>
+    `);
     
   } catch (error) {
-    return res.render('confirmation-error', {
-      error: error.message,
-      appName: this.configService.get('APP_NAME')
-    });
+    return res.status(400).send(`
+      <h1>❌ Error al activar la cuenta</h1>
+      <p>${error.message}</p>
+    `);
   }
-} 
+}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
