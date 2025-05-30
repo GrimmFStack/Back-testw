@@ -147,18 +147,10 @@ export class AuthService {
   }
 
   // auth.service.ts
-async confirmAccount(token: string): Promise<{ accessToken: string }> {
-  // 1. Activar el usuario
-  const user = await this.usersService.activateUserByToken(token);
-
-  // 2. Generar token JWT para sesión
-  const accessToken = this.jwtService.sign({
-    sub: user.user_id,
-    email: user.email,
-    is_active: true
-  });
-
-  return { accessToken };
+// auth.service.ts
+async confirmAccount(token: string): Promise<{ message: string }> {
+  await this.usersService.activateUserByToken(token);
+  return { message: 'Cuenta activada exitosamente' };
 }
 
   private async validateUser(email: string, password: string): Promise<User> {

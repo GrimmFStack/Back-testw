@@ -90,45 +90,9 @@ export class AuthController {
 
   // auth.controller.ts
 @Get('confirm/:token')
-async confirmAccount(
-  @Param('token') token: string,
-  @Res() res: Response
-) {
-  try {
-    const { accessToken } = await this.authService.confirmAccount(token);
-    
-    // Renderiza página simple con el token
-    return res.send(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Cuenta Activada</title>
-        <style>
-          body { font-family: Arial; text-align: center; padding: 40px; }
-          .token { 
-            background: #f5f5f5; 
-            padding: 15px; 
-            margin: 20px auto;
-            max-width: 500px;
-            word-break: break-all;
-          }
-        </style>
-      </head>
-      <body>
-        <h1>✅ Cuenta activada correctamente</h1>
-        <p>Tu token de acceso es:</p>
-        <div class="token">${accessToken}</div>
-        <p>Copia este token para iniciar sesión en la aplicación</p>
-      </body>
-      </html>
-    `);
-    
-  } catch (error) {
-    return res.status(400).send(`
-      <h1>❌ Error al activar la cuenta</h1>
-      <p>${error.message}</p>
-    `);
-  }
+async confirmAccount(@Param('token') token: string) {
+  await this.authService.confirmAccount(token);
+  return 'Cuenta activada'; // Texto plano simple
 }
 
   @Post('login')

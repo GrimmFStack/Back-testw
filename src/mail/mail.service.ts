@@ -12,26 +12,47 @@ export class MailService {
     private readonly configService: ConfigService
   ) {}
 
-  async sendConfirmationEmail(email: string, token: string, firstName?: string) {
-  const activationUrl = `${this.configService.get('BACKEND_URL')}/auth/confirm/${token}`;
-  const appName = this.configService.get('APP_NAME', 'Nuestra Plataforma');
+  async sendConfirmationEmail(email: string, token: string): Promise<void> {
+    const activationUrl = `${this.configService.get('BACKEND_URL')}/auth/confirm/${token}`;
+    const appName = this.configService.get('APP_NAME', 'App');
 
-  try {
-    await this.mailerService.sendMail({
-      to: email,
-      subject: `Confirma tu cuenta en ${appName}`,
-      template: 'confirmation',
-      context: {
-        email,
-        firstName: firstName || 'Usuario',
-        confirmUrl: activationUrl,
-        showButton: true, // ¡Asegúrate de incluir esto!
-        appName
-      }
-    });
-    this.logger.log(`Email enviado a ${email}`);
-  } catch (error) {
-    this.logger.error(`Error enviando email: ${error.message}`);
-    throw new Error('Error al enviar email de confirmación');
+    try {
+      await this.mailerService.sendMail({
+        from: this.configService.get('MAIL_FROM_ADDRESS'),
+        to: email,
+        subject: `Activa tu cuenta en ${appName}`,
+        template: 'confirmation',
+        context: {
+          email,
+          confirmUrl: activationUrl,
+          appName
+        }
+      });
+      this.logger.log(`Email de activación enviado a ${email}`);
+    } catch (error) {
+      this.logger.error(`Error enviando email a ${email}: ${error.message}`);
+      throw new Error('Error al enviar email de confirmación');
+    }
   }
-}}
+
+  async sendPasswordResetEmail(email: string, token: string): Promise<void> {
+    const resetUrl = `${this.configService.get('FRONTEND_URL')}/reset-password?token=${token}`;
+    
+    try {
+      await this.mailerService.sendMail({
+        from: this.configService.get('MAIL_FROM_ADDRESS'),
+        to: email,
+        subject: 'Restablece tu contraseña',
+        template: 'password-reset',
+        context: {
+          email,
+          resetUrl
+        }
+      });
+      this.logger.log(`Email de restablecimiento enviado a ${email}`);
+    } catch (error) {
+      this.logger.error(`Error enviando email a ${email}: ${error.message}`);
+      throw new Error('Error al enviar email de restablecimiento');
+    }
+  }
+} 
