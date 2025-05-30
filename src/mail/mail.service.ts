@@ -13,26 +13,25 @@ export class MailService {
   ) {}
 
   async sendConfirmationEmail(email: string, token: string, firstName?: string) {
-    const activationUrl = `${this.configService.get('BACKEND_URL')}/auth/confirm/${token}`;
-    const appName = this.configService.get('APP_NAME', 'Nuestra Plataforma');
+  const activationUrl = `${this.configService.get('BACKEND_URL')}/auth/confirm/${token}`;
+  const appName = this.configService.get('APP_NAME', 'Nuestra Plataforma');
 
-    try {
-      await this.mailerService.sendMail({
-        to: email,
-        subject: `Confirma tu cuenta en ${appName}`,
-        template: 'confirmation',
-        context: {
-          email,
-          firstName: firstName || 'Usuario',
-          confirmUrl: activationUrl,
-          appName
-        }
-      });
-
-      this.logger.log(`Email de confirmación enviado a ${email}`);
-    } catch (error) {
-      this.logger.error(`Error enviando correo a ${email}: ${error.message}`);
-      throw new Error('No se pudo enviar el correo de confirmación');
-    }
+  try {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: `Confirma tu cuenta en ${appName}`,
+      template: 'confirmation',
+      context: {
+        email,
+        firstName: firstName || 'Usuario',
+        confirmUrl: activationUrl,
+        showButton: true, // ¡Asegúrate de incluir esto!
+        appName
+      }
+    });
+    this.logger.log(`Email enviado a ${email}`);
+  } catch (error) {
+    this.logger.error(`Error enviando email: ${error.message}`);
+    throw new Error('Error al enviar email de confirmación');
   }
-}
+}}

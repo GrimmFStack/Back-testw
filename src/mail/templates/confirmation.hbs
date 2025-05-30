@@ -1,14 +1,24 @@
 <!DOCTYPE html>
-<div style="font-family: Arial; max-width: 600px; margin: 0 auto;">
-  <h1 style="color: #4CAF50;">¡Gracias por registrarte!</h1>
-  <p>Hola {{email}},</p>
-  
-  {{#if showButton}}
-    <a href="{{confirmUrl}}" 
-       style="background: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;">
-      Confirmar mi cuenta
-    </a>
-  {{/if}}
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Confirmación de registro</title>
+  </head>
+  <body>
+    <div style="font-family: Arial; max-width: 600px; margin: 0 auto;">
+      <h1 style="color: #4CAF50;">¡Gracias por registrarte!</h1>
+      <p>Hola {{email}},</p>
 
-  <p>Si no solicitaste este registro, ignora este mensaje.</p>
-</div>
+      {{#if showButton}}
+        <a 
+          href="{{confirmUrl}}"
+          style="background: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;"
+        >
+          Confirmar mi cuenta
+        </a>
+      {{/if}}
+
+      <p>Si no solicitaste este registro, ignora este mensaje.</p>
+    </div>
+  </body>
+</html>
