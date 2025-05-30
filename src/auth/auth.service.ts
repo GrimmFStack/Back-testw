@@ -146,10 +146,9 @@ export class AuthService {
     return formatResponse([{ message: 'Sesión cerrada correctamente' }]);
   }
 
-  // auth.service.ts
-// auth.service.ts
+
 async confirmAccount(token: string): Promise<{ message: string }> {
-  await this.usersService.activateUserByToken(token);
+  await this.usersService.activateUserByToken(token); 
   return { message: 'Cuenta activada exitosamente' };
 }
 

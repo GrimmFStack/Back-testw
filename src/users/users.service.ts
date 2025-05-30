@@ -193,13 +193,13 @@ export class UserService {
     return this.userRepository.save(user); 
   }
 
-  // user.service.ts
 async activateUserByToken(token: string): Promise<void> {
   const result = await this.userRepository.update(
     { activation_token: token },
     { 
       is_active: true,
-      activation_token: null // Elimina el token usado
+      activation_token: null,
+      created_at: new Date() 
     }
   );
 
